@@ -7,6 +7,7 @@ namespace Coral {
 
 	class Type;
 	class Attribute;
+	class ManagedAssembly;
 
 	class MethodInfo
 	{
@@ -24,6 +25,7 @@ namespace Coral {
 		ManagedHandle m_Handle = -1;
 		Type* m_ReturnType = nullptr;
 		std::vector<Type*> m_ParameterTypes;
+		ManagedAssembly* m_Assembly = nullptr;
 
 		friend class Type;
 	};

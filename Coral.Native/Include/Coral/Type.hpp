@@ -117,6 +117,7 @@ namespace Coral {
 		Type* m_BaseType = nullptr;
 		std::optional<std::vector<Type*>> m_InterfaceTypes = std::nullopt;
 		Type* m_ElementType = nullptr;
+		ManagedAssembly* m_Assembly = nullptr;
 
 		friend class HostInstance;
 		friend class ManagedAssembly;

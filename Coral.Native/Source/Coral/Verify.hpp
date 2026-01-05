@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #define CORAL_SOURCE_LOCATION const char* file = __FILE__; int line = __LINE__
 
 #if defined(__GNUC__)

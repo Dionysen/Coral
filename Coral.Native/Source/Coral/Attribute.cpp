@@ -1,6 +1,6 @@
 #include "Coral/Attribute.hpp"
 #include "Coral/Type.hpp"
-#include "Coral/TypeCache.hpp"
+#include "Coral/Assembly.hpp"
 #include "Coral/String.hpp"
 
 #include "CoralManagedFunctions.hpp"
@@ -11,9 +11,12 @@ namespace Coral {
 	{
 		if (!m_Type)
 		{
-			Type type;
-			s_ManagedFunctions.GetAttributeTypeFptr(m_Handle, &type.m_Id);
-			m_Type = TypeCache::Get().CacheType(std::move(type));
+			TypeId typeId;
+			s_ManagedFunctions.GetAttributeTypeFptr(m_Handle, &typeId);
+			if (m_Assembly)
+			{
+				m_Type = &m_Assembly->GetLocalType(typeId);
+			}
 		}
 
 		return *m_Type;

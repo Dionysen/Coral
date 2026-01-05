@@ -3,7 +3,6 @@
 #include "Coral/String.hpp"
 #include "Coral/StringHelper.hpp"
 #include "Coral/Type.hpp"
-#include "Coral/TypeCache.hpp"
 
 #include "CoralManagedFunctions.hpp"
 
@@ -107,9 +106,11 @@ namespace Coral {
 	{
 		if (!m_Type)
 		{
-			Type type;
-			s_ManagedFunctions.GetObjectTypeIdFptr(m_Handle, &type.m_Id);
-			m_Type = TypeCache::Get().CacheType(std::move(type));
+			TypeId typeId;
+			s_ManagedFunctions.GetObjectTypeIdFptr(m_Handle, &typeId);
+			// Note: ManagedObject doesn't have direct access to Assembly.
+			// The Type should be set when the object is created.
+			// If m_Type is null here, it means the object wasn't properly initialized.
 		}
 
 		return *m_Type;

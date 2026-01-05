@@ -1,7 +1,7 @@
 #include "Coral/MethodInfo.hpp"
 #include "Coral/Type.hpp"
 #include "Coral/Attribute.hpp"
-#include "Coral/TypeCache.hpp"
+#include "Coral/Assembly.hpp"
 
 #include "CoralManagedFunctions.hpp"
 
@@ -16,9 +16,12 @@ namespace Coral {
 	{
 		if (!m_ReturnType)
 		{
-			Type returnType;
-			s_ManagedFunctions.GetMethodInfoReturnTypeFptr(m_Handle, &returnType.m_Id);
-			m_ReturnType = TypeCache::Get().CacheType(std::move(returnType));
+			TypeId returnTypeId;
+			s_ManagedFunctions.GetMethodInfoReturnTypeFptr(m_Handle, &returnTypeId);
+			if (m_Assembly)
+			{
+				m_ReturnType = &m_Assembly->GetLocalType(returnTypeId);
+			}
 		}
 
 		return *m_ReturnType;
@@ -36,11 +39,12 @@ namespace Coral {
 
 			m_ParameterTypes.resize(parameterTypes.size());
 
-			for (size_t i = 0; i < parameterTypes.size(); i++)
+			if (m_Assembly)
 			{
-				Type type;
-				type.m_Id = parameterTypes[i];
-				m_ParameterTypes[i] = TypeCache::Get().CacheType(std::move(type));
+				for (size_t i = 0; i < parameterTypes.size(); i++)
+				{
+					m_ParameterTypes[i] = &m_Assembly->GetLocalType(parameterTypes[i]);
+				}
 			}
 		}
 
@@ -62,7 +66,10 @@ namespace Coral {
 
 		std::vector<Attribute> result(attributeHandles.size());
 		for (size_t i = 0; i < attributeHandles.size(); i++)
+		{
 			result[i].m_Handle = attributeHandles[i];
+			result[i].m_Assembly = m_Assembly;
+		}
 
 		return result;
 	}

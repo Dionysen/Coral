@@ -1,7 +1,7 @@
 #include "Coral/FieldInfo.hpp"
 #include "Coral/Type.hpp"
 #include "Coral/Attribute.hpp"
-#include "Coral/TypeCache.hpp"
+#include "Coral/Assembly.hpp"
 
 #include "CoralManagedFunctions.hpp"
 
@@ -16,9 +16,12 @@ namespace Coral {
 	{
 		if (!m_Type)
 		{
-			Type fieldType;
-			s_ManagedFunctions.GetFieldInfoTypeFptr(m_Handle, &fieldType.m_Id);
-			m_Type = TypeCache::Get().CacheType(std::move(fieldType));
+			TypeId fieldTypeId;
+			s_ManagedFunctions.GetFieldInfoTypeFptr(m_Handle, &fieldTypeId);
+			if (m_Assembly)
+			{
+				m_Type = &m_Assembly->GetLocalType(fieldTypeId);
+			}
 		}
 
 		return *m_Type;
@@ -38,7 +41,10 @@ namespace Coral {
 
 		std::vector<Attribute> result(attributeHandles.size());
 		for (size_t i = 0; i < attributeHandles.size(); i++)
+		{
 			result[i].m_Handle = attributeHandles[i];
+			result[i].m_Assembly = m_Assembly;
+		}
 
 		return result;
 	}

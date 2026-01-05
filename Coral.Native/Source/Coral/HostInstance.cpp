@@ -1,6 +1,5 @@
 #include "Coral/HostInstance.hpp"
 #include "Coral/StringHelper.hpp"
-#include "Coral/TypeCache.hpp"
 
 #include "Verify.hpp"
 #include "HostFXRErrorCodes.hpp"

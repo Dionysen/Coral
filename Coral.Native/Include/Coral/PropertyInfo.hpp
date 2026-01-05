@@ -7,6 +7,7 @@ namespace Coral {
 
 	class Type;
 	class Attribute;
+	class ManagedAssembly;
 
 	class PropertyInfo
 	{
@@ -19,6 +20,7 @@ namespace Coral {
 	private:
 		ManagedHandle m_Handle = -1;
 		Type* m_Type = nullptr;
+		ManagedAssembly* m_Assembly = nullptr;
 
 		friend class Type;
 	};

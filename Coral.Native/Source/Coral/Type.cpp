@@ -1,5 +1,5 @@
 #include "Coral/Type.hpp"
-#include "Coral/TypeCache.hpp"
+#include "Coral/Assembly.hpp"
 #include "Coral/Attribute.hpp"
 
 #include "CoralManagedFunctions.hpp"
@@ -20,9 +20,12 @@ namespace Coral {
 	{
 		if (!m_BaseType)
 		{
-			Type baseType;
-			s_ManagedFunctions.GetBaseTypeFptr(m_Id, &baseType.m_Id);
-			m_BaseType = TypeCache::Get().CacheType(std::move(baseType));
+			TypeId baseTypeId;
+			s_ManagedFunctions.GetBaseTypeFptr(m_Id, &baseTypeId);
+			if (m_Assembly)
+			{
+				m_BaseType = &m_Assembly->GetLocalType(baseTypeId);
+			}
 		}
 
 		return *m_BaseType;
@@ -42,11 +45,12 @@ namespace Coral {
 			m_InterfaceTypes = std::vector<Type*>();
 			m_InterfaceTypes->reserve(static_cast<size_t>(count));
 
-			for (auto id : typeIds)
+			if (m_Assembly)
 			{
-				Type type;
-				type.m_Id = id;
-				m_InterfaceTypes->emplace_back(TypeCache::Get().CacheType(std::move(type)));
+				for (auto id : typeIds)
+				{
+					m_InterfaceTypes->emplace_back(&m_Assembly->GetLocalType(id));
+				}
 			}
 		}
 
@@ -82,7 +86,10 @@ namespace Coral {
 
 		std::vector<MethodInfo> methods(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
+		{
 			methods[i].m_Handle = handles[i];
+			methods[i].m_Assembly = m_Assembly;
+		}
 
 		return methods;
 	}
@@ -96,7 +103,10 @@ namespace Coral {
 
 		std::vector<FieldInfo> fields(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
+		{
 			fields[i].m_Handle = handles[i];
+			fields[i].m_Assembly = m_Assembly;
+		}
 
 		return fields;
 	}
@@ -110,7 +120,10 @@ namespace Coral {
 
 		std::vector<PropertyInfo> properties(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
+		{
 			properties[i].m_Handle = handles[i];
+			properties[i].m_Assembly = m_Assembly;
+		}
 
 		return properties;
 	}
@@ -129,7 +142,10 @@ namespace Coral {
 
 		std::vector<Attribute> result(attributeHandles.size());
 		for (size_t i = 0; i < attributeHandles.size(); i++)
+		{
 			result[i].m_Handle = attributeHandles[i];
+			result[i].m_Assembly = m_Assembly;
+		}
 
 		return result;
 	}
@@ -148,9 +164,12 @@ namespace Coral {
 	{
 		if (!m_ElementType)
 		{
-			Type elementType;
-			s_ManagedFunctions.GetElementTypeFptr(m_Id, &elementType.m_Id);
-			m_ElementType = TypeCache::Get().CacheType(std::move(elementType));
+			TypeId elementTypeId;
+			s_ManagedFunctions.GetElementTypeFptr(m_Id, &elementTypeId);
+			if (m_Assembly)
+			{
+				m_ElementType = &m_Assembly->GetLocalType(elementTypeId);
+			}
 		}
 
 		return *m_ElementType;
@@ -187,17 +206,10 @@ namespace Coral {
 	ReflectionType::operator Type&() const
 	{
 		static Type s_NullType;
-
-		auto* result = TypeCache::Get().GetTypeByID(m_TypeID);
-
-		if (result == nullptr)
-		{
-			Type type;
-			type.m_Id = m_TypeID;
-			result = TypeCache::Get().CacheType(std::move(type));
-		}
-
-		return result != nullptr ? *result : s_NullType;
+		// Note: ReflectionType doesn't have an Assembly reference.
+		// This operator is deprecated and should be avoided.
+		// Use Assembly::GetLocalType(TypeId) instead.
+		return s_NullType;
 	}
 
 }

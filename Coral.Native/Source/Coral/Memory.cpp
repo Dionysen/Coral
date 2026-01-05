@@ -1,5 +1,5 @@
 #include "Coral/Memory.hpp"
-
+#include <Windows.h>
 namespace Coral {
 
 	void* Memory::AllocHGlobal(size_t InSize)
@@ -34,7 +34,11 @@ namespace Coral {
 		if (buffer != nullptr)
 		{
 			memset(buffer, 0xCE, size);
+#ifdef _MSC_VER
+			wcscpy_s(buffer, length, InString.data());
+#else
 			wcscpy(buffer, InString.data());
+#endif
 		}
 #else
 		UCChar* buffer;

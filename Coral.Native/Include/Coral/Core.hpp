@@ -67,7 +67,9 @@
 #define CORAL_DOTNET_TARGET_VERSION_MAJOR 8
 #define CORAL_DOTNET_TARGET_VERSION_MAJOR_STR '8'
 */
-#define CORAL_UNMANAGED_CALLERS_ONLY ((const UCChar*) (-1ULL))
+// NOTE(Coral): Special value for UnmanagedCallersOnly delegates
+	// Using reinterpret_cast to avoid unary minus on unsigned type warning
+	#define CORAL_UNMANAGED_CALLERS_ONLY (reinterpret_cast<const UCChar*>(~0ULL))
 
 namespace Coral {
 

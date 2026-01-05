@@ -1,7 +1,6 @@
 #include "Coral/Assembly.hpp"
 #include "Coral/HostInstance.hpp"
 #include "Coral/StringHelper.hpp"
-#include "Coral/TypeCache.hpp"
 
 #include "CoralManagedFunctions.hpp"
 #include "Verify.hpp"
@@ -34,12 +33,6 @@ namespace Coral {
 
 	static Type s_NullType;
 
-	Type& ManagedAssembly::GetType(std::string_view InClassName) const
-	{
-		Type* type = TypeCache::Get().GetTypeByName(InClassName);
-		return type != nullptr ? *type : s_NullType;
-	}
-
 	Type& ManagedAssembly::GetLocalType(std::string_view InClassName) const
 	{
 		auto it = m_LocalTypeNameCache.find(std::string(InClassName));
@@ -50,11 +43,6 @@ namespace Coral {
 	{
 		auto it = m_LocalTypeIdCache.find(InClassId);
 		return it == m_LocalTypeIdCache.end() ? s_NullType : *it->second;
-	}
-
-	const std::vector<Type*>& ManagedAssembly::GetTypes() const
-	{
-		return m_Types;
 	}
 
 	const std::vector<Type>& ManagedAssembly::GetLocalTypes() const
@@ -91,11 +79,9 @@ namespace Coral {
 			result.m_LocalTypeNameCache.reserve(typeIds.size());
 			for (auto typeId : typeIds)
 			{
-				Type type;
-				type.m_Id = typeId;
-				result.m_Types.push_back(TypeCache::Get().CacheType(std::move(type)));
-
-				Type& inserted = result.m_LocalTypes.emplace_back(std::move(type));
+				Type& inserted = result.m_LocalTypes.emplace_back();
+				inserted.m_Id = typeId;
+				inserted.m_Assembly = &result;
 				result.m_LocalTypeIdCache[inserted.GetTypeId()] = &inserted;
 				result.m_LocalTypeNameCache[inserted.GetFullName()] = &inserted;
 			}
@@ -124,11 +110,16 @@ namespace Coral {
 			std::vector<TypeId> typeIds(static_cast<size_t>(typeCount));
 			s_ManagedFunctions.GetAssemblyTypesFptr(m_ContextId, result.m_AssemblyId, typeIds.data(), &typeCount);
 
+			result.m_LocalTypes.reserve(typeIds.size());
+			result.m_LocalTypeIdCache.reserve(typeIds.size());
+			result.m_LocalTypeNameCache.reserve(typeIds.size());
 			for (auto typeId : typeIds)
 			{
-				Type type;
-				type.m_Id = typeId;
-				result.m_Types.push_back(TypeCache::Get().CacheType(std::move(type)));
+				Type& inserted = result.m_LocalTypes.emplace_back();
+				inserted.m_Id = typeId;
+				inserted.m_Assembly = &result;
+				result.m_LocalTypeIdCache[inserted.GetTypeId()] = &inserted;
+				result.m_LocalTypeNameCache[inserted.GetFullName()] = &inserted;
 			}
 		}
 

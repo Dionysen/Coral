@@ -28,14 +28,8 @@ namespace Coral {
 		void AddInternalCall(std::string_view InClassName, std::string_view InVariableName, void* InFunctionPtr);
 		void UploadInternalCalls();
 
-		[[deprecated(CORAL_GLOBAL_ALC_MSG)]]
-		Type& GetType(std::string_view InClassName) const;
-
 		Type& GetLocalType(std::string_view InClassName) const;
 		Type& GetLocalType(TypeId InTypeId) const;
-
-		[[deprecated(CORAL_GLOBAL_ALC_MSG)]]
-		const std::vector<Type*>& GetTypes() const;
 
 		const std::vector<Type>& GetLocalTypes() const;
 
@@ -49,8 +43,6 @@ namespace Coral {
 		std::vector<UCString> m_InternalCallNameStorage;
 
 		std::vector<InternalCall> m_InternalCalls;
-
-		std::vector<Type*> m_Types;
 
 		// NOTE(Emily): Doesn't need to be a `StableVector` since it's static post-init.
 		std::vector<Type> m_LocalTypes;

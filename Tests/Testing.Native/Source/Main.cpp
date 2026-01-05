@@ -4,7 +4,9 @@
 #include <filesystem>
 #include <chrono>
 #include <functional>
+#if __cplusplus >= 202002L
 #include <ranges>
+#endif
 
 #include <Coral/HostInstance.hpp>
 #include <Coral/DotnetServices.hpp>
